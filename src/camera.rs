@@ -1,18 +1,23 @@
 use std::time::Duration;
 use glm::{Matrix4, Vector3};
+use once_cell::sync::Lazy;
+
+
+/// global up vector
+static UP: Lazy<Vector3<f32>> = Lazy::new(|| Vector3::new(0.0, 1.0, 0.0));
+const NEAR: f32 = 0.1;
+const FAR: f32 = 100.0;
+const ASPECT: f32 = 8.0 / 5.0;
+const FOV: f32 = 45.0;
 
 #[derive(Debug)]
 pub struct Camera {
     pos: Vector3<f32>,
+    pitch: f32, // [-89, 89]
+    yaw: f32,
     front: Vector3<f32>,
-    up: Vector3<f32>,
     move_speed: f32,
     mouse_speed: f32,
-
-    near: f32,
-    far: f32,
-    fov: f32,
-    aspect: f32,
 }
 
 pub struct CameraBuilder {
@@ -23,15 +28,12 @@ impl Default for CameraBuilder {
     fn default() -> Self {
         Self {
             inner: Camera {
-                pos: Vector3::new(0.0, 0.0, 5.0),
-                front: Vector3::new(0.0, 0.0, 0.0),
-                up: Vector3::new(0.0, 1.0, 0.0),
+                pos: Vector3::new(0.0, 0.0, 3.0),
+                pitch: 0.0,
+                yaw: 90.0,
+                front: Vector3::new(0.0, 0.0, -1.0),
                 move_speed: 2.5,
-                mouse_speed: 0.01,
-                near: 0.1,
-                far: 100.0,
-                fov: 45.0,
-                aspect: 1.0,
+                mouse_speed: 40.0,
             },
         }
     }
@@ -43,16 +45,6 @@ impl CameraBuilder {
         self
     }
 
-    pub fn front(mut self, front: Vector3<f32>) -> Self {
-        self.inner.front = front;
-        self
-    }
-
-    pub fn up(mut self, up: Vector3<f32>) -> Self {
-        self.inner.up = up;
-        self
-    }
-
     pub fn move_speed(mut self, move_speed: f32) -> Self {
         self.inner.move_speed = move_speed;
         self
@@ -60,6 +52,17 @@ impl CameraBuilder {
 
     pub fn mouse_speed(mut self, mouse_speed: f32) -> Self {
         self.inner.mouse_speed = mouse_speed;
+        self
+    }
+    /// pitch in degrees, [-89, 89]
+    pub fn pitch(mut self, pitch: f32) -> Self {
+        self.inner.pitch = pitch;
+        self
+    }
+
+    /// yaw in degrees
+    pub fn yaw(mut self, yaw: f32) -> Self {
+        self.inner.yaw = yaw;
         self
     }
 
@@ -85,33 +88,52 @@ impl Camera {
                 self.pos = self.pos - self.front * move_speed;
             }
             CameraMovement::Left => {
-                self.pos = self.pos - glm::normalize(glm::cross(self.front, self.up)) * move_speed;
+                self.pos = self.pos - glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
             }
             CameraMovement::Right => {
-                self.pos = self.pos + glm::normalize(glm::cross(self.front, self.up)) * move_speed;
+                self.pos = self.pos + glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
             }
             CameraMovement::Up => {
-                self.pos = self.pos + self.up * move_speed;
+                self.pos = self.pos + UP.clone() * move_speed;
             }
             CameraMovement::Down => {
-                self.pos = self.pos - self.up * move_speed;
+                self.pos = self.pos - UP.clone() * move_speed;
             }
             CameraMovement::Rotate(x, y) => {
                 let x = x * mouse_speed;
                 let y = y * mouse_speed;
-                let mut front = self.front;
-                front.x = (front.x * x.cos() - front.z * x.sin()).cos() * front.y.cos();
-                front.y = front.y.sin() * y.sin() + front.y.cos() * y.cos();
-                front.z = (front.z * x.cos() + front.x * x.sin()).sin() * front.y.cos();
-                self.front = front;
+                self.pitch -= y;
+                if self.pitch > 89.0 {
+                    self.pitch = 89.0;
+                } else if self.pitch < -89.0 {
+                    self.pitch = -89.0;
+                }
+
+                self.yaw -= x;
+                if self.yaw > 360.0 {
+                    self.yaw -= 360.0;
+                } else if self.yaw < 0.0 {
+                    self.yaw += 360.0;
+                }
+
+                self.front = self.calc_front();
             }
         }
-        println!("{self:#?}");
     }
 
     pub fn get_mat(&self) -> Matrix4<f32> {
-        let mut mat = glm::ext::look_at(self.pos, self.pos + self.front, self.up);
-        mat * glm::ext::perspective(glm::radians(self.fov), self.aspect, self.near, self.far)
+        let view_mat = glm::ext::look_at(self.pos, self.pos + self.front, UP.clone());
+        let proj_mat = glm::ext::perspective(FOV, ASPECT, NEAR, FAR);
+        proj_mat * view_mat
+    }
+
+    /// return normalized front vector
+    fn calc_front(&self) -> Vector3<f32> {
+        // (cos(yaw), tan(pitch), -sin(yaw))
+        let yaw = glm::radians(self.yaw);
+        let pitch = glm::radians(self.pitch);
+        let front = Vector3::new(yaw.cos(), pitch.tan(), -yaw.sin());
+        glm::normalize(front)
     }
 }
 
