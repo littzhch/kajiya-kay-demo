@@ -1,25 +1,19 @@
-mod camera;
-mod camera_events;
-mod refresh_rate;
-
-
 use std::io::Cursor;
 use std::error::Error;
-use std::time;
-use std::time::{Duration, Instant};
 use glium::{Display, implement_vertex, Program, Surface, texture, uniform, VertexBuffer};
 use glium::glutin::ContextBuilder;
 use glium::glutin::dpi::PhysicalSize;
-use glium::glutin::event::{ElementState, Event, KeyboardInput, StartCause, VirtualKeyCode, WindowEvent};
+use glium::glutin::event::{Event, StartCause, WindowEvent};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::window::WindowBuilder;
 use glium::texture::{SrgbTexture2d};
 use image::ImageFormat;
-use crate::camera::{Camera, CameraMovement};
-use crate::refresh_rate::RefreshRate;
-use glium::glutin::event::DeviceEvent;
-use glm::Vector3;
-use crate::camera_events::CameraHandler;
+
+use kajiya_kay_demo::camera::Camera;
+use kajiya_kay_demo::refresh_rate::RefreshRate;
+use kajiya_kay_demo::camera_events::CameraHandler;
+use kajiya_kay_demo::light_source::Light;
+use kajiya_kay_demo::Drawable;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let event_loop = EventLoop::new();
@@ -57,8 +51,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let program = Program::from_source(
         &display,
-        &VERTEX_SHADER_SRC,
-        &FRAGMENT_SHADER_SRC,
+        VERTEX_SHADER_SRC,
+        FRAGMENT_SHADER_SRC,
         None)?;
 
     let texture1 = create_texture1(&display);
@@ -79,6 +73,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut camera = Camera::new();
     let mut rate = RefreshRate::new(120.0);
     let mut camera_handler = CameraHandler::new();
+
+    let light = Light::init(&display);
 
     event_loop.run(move |event, _, controlflow| {
         camera_handler.handle_event(&event, display.gl_window().window());
@@ -103,10 +99,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         *controlflow = ControlFlow::WaitUntil(rate.refresh_now());
         camera_handler.update_camera(&mut camera, rate.interval());
 
-        // let final_mat = get_projection_mat() * glm::ext::look_at_rh(Vector3::new(0.0, 0.0, 5.0),
-        // Vector3::new(0.0, 0.2, 0.0), glm::normalize(Vector3::new(-1.0, 1.0, 0.0)),
-        // ) * model_mat;
-
         let final_mat = camera.get_mat() * model_mat;
 
         let uniforms = uniform! {
@@ -127,6 +119,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         target.clear_color_and_depth((0.2, 0.3, 0.3, 1.0),1.0);
         target.draw(&vertex_buffer, &indices, &program, &uniforms,
                     &drawparams).unwrap();
+        light.draw_with_frame(&mut target, final_mat, &drawparams);
         target.finish().unwrap();
     })
 }
@@ -136,8 +129,7 @@ fn create_texture1(display: &Display) -> SrgbTexture2d {
                             ImageFormat::Png).unwrap().to_rgba8();
     let id = image.dimensions();
     let image = texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), id);
-    let image =SrgbTexture2d::new(display, image).unwrap();
-    return image;
+    SrgbTexture2d::new(display, image).unwrap()
 }
 
 fn create_texture2(display: &Display) -> SrgbTexture2d {
@@ -145,8 +137,7 @@ fn create_texture2(display: &Display) -> SrgbTexture2d {
                             ImageFormat::Png).unwrap().to_rgb8();
     let id = image.dimensions();
     let image = texture::RawImage2d::from_raw_rgb_reversed(&image.into_raw(), id);
-    let image = SrgbTexture2d::new(display, image).unwrap();
-    return image;
+    SrgbTexture2d::new(display, image).unwrap()
 }
 
 fn get_model_mat() -> glm::Mat4 {
@@ -154,24 +145,6 @@ fn get_model_mat() -> glm::Mat4 {
     let axis = glm::vec3(1.0, 0.0, 0.0);
     glm::ext::rotate(&glm::Mat4::one(),  0.0, axis)
 }
-
-fn get_view_mat() -> glm::Mat4 {
-    use num_traits::identities::One;
-    glm::ext::translate(&glm::Mat4::one(), glm::vec3(0.0, 0.0, -3.0))
-}
-
-fn get_projection_mat() -> glm::Mat4 {
-    glm::ext::perspective_rh(glm::radians(60.0), 4.0 / 3.0, 0.1, 100.0)
-}
-
-fn get_rotate_mat(degree: f32) -> glm::Mat4 {
-    use num_traits::identities::One;
-    let axis = glm::vec3(0.0, 1.0, 0.0);
-    glm::ext::rotate(&glm::Mat4::one(),  glm::radians(degree), axis)
-}
-
-
-
 
 
 #[derive(Clone, Copy)]
