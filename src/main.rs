@@ -19,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let event_loop = EventLoop::new();
 
     let wb = WindowBuilder::new()
-        .with_title("a window")
+        .with_title("kajiya-kay demo")
         .with_inner_size(PhysicalSize::new(800, 600));
 
     let display = Display::new(wb, ContextBuilder::new().with_depth_buffer(24), &event_loop)?;
@@ -71,7 +71,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 
     let mut camera = Camera::new();
-    let mut rate = RefreshRate::new(120.0);
+    let mut rate = RefreshRate::new(61.0);
     let mut camera_handler = CameraHandler::new();
 
     let light = Light::init(&display);
