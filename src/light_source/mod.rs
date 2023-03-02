@@ -8,7 +8,7 @@ use glm::Mat4;
 pub struct Light {
     program: Program,
     vertex_buffer: VertexBuffer<Vertex>,
-    indices: IndexBuffer<u16>,
+    indices: IndexBuffer<u8>,
 }
 
 impl Light {
@@ -38,7 +38,7 @@ impl Light {
             display,
             glium::index::PrimitiveType::TrianglesList,
             &[
-                0u16, 3, 1, 3, 2, 1, 0, 1, 5, 5, 4, 0, 4, 5, 6, 6, 7, 4, 7, 6, 2, 2, 3, 7, 4, 7, 3,
+                0u8, 3, 1, 3, 2, 1, 0, 1, 5, 5, 4, 0, 4, 5, 6, 6, 7, 4, 7, 6, 2, 2, 3, 7, 4, 7, 3,
                 3, 0, 4, 2, 6, 5, 5, 1, 2,
             ],
         )
@@ -93,7 +93,7 @@ struct Vertex {
 implement_vertex!(Vertex, pos location(0));
 
 impl Vertex {
-    pub fn new(x: f32, y: f32, z: f32) -> Self {
+    fn new(x: f32, y: f32, z: f32) -> Self {
         Self { pos: [x, y, z] }
     }
 }
