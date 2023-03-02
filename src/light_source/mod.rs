@@ -3,12 +3,14 @@ use glium::{
     implement_vertex, uniform, Display, DrawParameters, Frame, IndexBuffer, Program, Surface,
     VertexBuffer,
 };
-use glm::Mat4;
+use glm::{Mat4, Vec3};
 
 pub struct Light {
     program: Program,
     vertex_buffer: VertexBuffer<Vertex>,
     indices: IndexBuffer<u8>,
+    light_color: (f32, f32, f32),
+    light_pos: Vec3,
 }
 
 impl Light {
@@ -48,7 +50,17 @@ impl Light {
             program,
             vertex_buffer,
             indices,
+            light_color: (1.0, 1.0, 1.0),
+            light_pos: Vec3::new(2.0, 2.0, 2.0),
         }
+    }
+
+    pub fn set_light_color(&mut self, color: (f32, f32, f32)) {
+        self.light_color = color;
+    }
+
+    pub fn set_light_pos(&mut self, pos: Vec3) {
+        self.light_pos = pos;
     }
 }
 
@@ -70,8 +82,8 @@ impl Drawable for Light {
                 *camera_mat.as_array()[2].as_array(),
                 *camera_mat.as_array()[3].as_array(),
             ],
-            shift: [2.0f32, 2.0, 2.0],
-            light_color: [1.0f32, 1.0, 1.0],
+            shift: [self.light_pos.x, self.light_pos.y, self.light_pos.z],
+            light_color: [self.light_color.0, self.light_color.1, self.light_color.2],
         };
 
         frame
