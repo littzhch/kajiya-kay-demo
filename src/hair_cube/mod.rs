@@ -1,13 +1,15 @@
-use crate::Drawable;
+use std::io::Cursor;
+
+use glium::{
+    Display, DrawParameters, Frame, implement_vertex, IndexBuffer, Program, Surface, texture,
+    uniform, VertexBuffer,
+};
 use glium::texture::SrgbTexture2d;
 use glium::uniforms::Sampler;
-use glium::{
-    implement_vertex, texture, uniform, Display, DrawParameters, Frame, IndexBuffer, Program,
-    Surface, VertexBuffer,
-};
 use glm::Mat4;
 use image::ImageFormat;
-use std::io::Cursor;
+
+use crate::Drawable;
 
 pub struct HairCube {
     program: Program,
@@ -28,14 +30,41 @@ impl Drawable for HairCube {
         .unwrap();
 
         let shape = vec![
-            Vertex::new((0.5, 0.5, 0.5), (1.0, 1.0)),
-            Vertex::new((0.5, -0.5, 0.5), (1.0, 0.0)),
-            Vertex::new((-0.5, -0.5, 0.5), (0.0, 0.0)),
-            Vertex::new((-0.5, 0.5, 0.5), (0.0, 1.0)),
-            Vertex::new((0.5, 0.5, -0.5), (2.0, 1.0)),
-            Vertex::new((0.5, -0.5, -0.5), (2.0, 0.0)),
-            Vertex::new((-0.5, -0.5, -0.5), (3.0, 0.0)),
-            Vertex::new((-0.5, 0.5, -0.5), (3.0, 1.0)),
+            // 前面
+            Vertex::new((-0.5, 0.5, 0.5), (0.0, 0.0, 1.0), (0.0, 1.0)),
+            Vertex::new((0.5, 0.5, 0.5), (0.0, 0.0, 1.0), (1.0, 1.0)),
+            Vertex::new((0.5, -0.5, 0.5), (0.0, 0.0, 1.0), (1.0, 0.0)),
+            Vertex::new((-0.5, -0.5, 0.5), (0.0, 0.0, 1.0), (0.0, 0.0)),
+
+            // 右面
+            Vertex::new((0.5, 0.5, 0.5), (1.0, 0.0, 0.0), (0.0, 1.0)),
+            Vertex::new((0.5, 0.5, -0.5), (1.0, 0.0, 0.0), (1.0, 1.0)),
+            Vertex::new((0.5, -0.5, -0.5), (1.0, 0.0, 0.0), (1.0, 0.0)),
+            Vertex::new((0.5, -0.5, 0.5), (1.0, 0.0, 0.0), (0.0, 0.0)),
+
+            // 后面
+            Vertex::new((-0.5, 0.5, -0.5), (0.0, 0.0, -1.0), (1.0, 1.0)),
+            Vertex::new((0.5, 0.5, -0.5), (0.0, 0.0, -1.0), (0.0, 1.0)),
+            Vertex::new((0.5, -0.5, -0.5), (0.0, 0.0, -1.0), (0.0, 0.0)),
+            Vertex::new((-0.5, -0.5, -0.5), (0.0, 0.0, -1.0), (1.0, 0.0)),
+
+            // 左面
+            Vertex::new((-0.5, 0.5, -0.5), (-1.0, 0.0, 0.0), (0.0, 1.0)),
+            Vertex::new((-0.5, -0.5, -0.5), (-1.0, 0.0, 0.0), (0.0, 0.0)),
+            Vertex::new((-0.5, -0.5, 0.5), (-1.0, 0.0, 0.0), (1.0, 0.0)),
+            Vertex::new((-0.5, 0.5, 0.5), (-1.0, 0.0, 0.0), (1.0, 1.0)),
+
+            // 上面
+            Vertex::new((-0.5, 0.5, -0.5), (0.0, 1.0, 0.0), (0.0, 1.0)),
+            Vertex::new((0.5, 0.5, -0.5), (0.0, 1.0, 0.0), (1.0, 1.0)),
+            Vertex::new((0.5, 0.5, 0.5), (0.0, 1.0, 0.0), (1.0, 0.0)),
+            Vertex::new((-0.5, 0.5, 0.5), (0.0, 1.0, 0.0), (0.0, 0.0)),
+
+            // 下面
+            Vertex::new((-0.5, -0.5, -0.5), (0.0, -1.0, 0.0), (0.0, 0.0)),
+            Vertex::new((0.5, -0.5, -0.5), (0.0, -1.0, 0.0), (1.0, 0.0)),
+            Vertex::new((0.5, -0.5, 0.5), (0.0, -1.0, 0.0), (1.0, 1.0)),
+            Vertex::new((-0.5, -0.5, 0.5), (0.0, -1.0, 0.0), (0.0, 1.0)),
         ];
 
         let vertex_buffer = VertexBuffer::new(display, &shape).unwrap();
@@ -44,8 +73,12 @@ impl Drawable for HairCube {
             display,
             glium::index::PrimitiveType::TrianglesList,
             &[
-                0u8, 3, 1, 3, 2, 1, 0, 1, 5, 5, 4, 0, 4, 5, 6, 6, 7, 4, 7, 6, 2, 2, 3, 7, 4, 7, 3,
-                3, 0, 4, 2, 6, 5, 5, 1, 2,
+                0, 3, 2, 0, 2, 1, // 前面
+                4, 7, 6, 4, 6, 5, // 右面
+                9, 10, 11, 9, 11, 8, // 后面
+                12, 13, 14, 12, 14, 15, // 左面
+                16, 19, 18, 16, 18, 17, // 上面
+                23, 20, 21, 23, 21, 22, // 下面
             ],
         )
         .unwrap();
@@ -96,14 +129,16 @@ impl HairCube {
 #[derive(Clone, Copy)]
 struct Vertex {
     position: [f32; 3],
+    normal: [f32; 3],
     tex_coord: [f32; 2],
 }
-implement_vertex!(Vertex, position location(0), tex_coord location(1));
+implement_vertex!(Vertex, position location(0), normal location(1), tex_coord location(2));
 
 impl Vertex {
-    fn new((x, y, z): (f32, f32, f32), (tx, ty): (f32, f32)) -> Self {
+    fn new((x, y, z): (f32, f32, f32), (nx, ny, nz): (f32, f32, f32), (tx, ty): (f32, f32)) -> Self {
         Self {
             position: [x, y, z],
+            normal: [nx, ny, nz],
             tex_coord: [tx, ty],
         }
     }
