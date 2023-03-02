@@ -14,6 +14,7 @@ pub struct HairCube {
     vertex_buffer: VertexBuffer<Vertex>,
     indices: IndexBuffer<u8>,
     texture: SrgbTexture2d,
+    light_color: (f32, f32, f32),
 }
 
 impl Drawable for HairCube {
@@ -56,6 +57,7 @@ impl Drawable for HairCube {
             vertex_buffer,
             indices,
             texture,
+            light_color: (1.0, 1.0, 1.0),
         }
     }
 
@@ -70,6 +72,7 @@ impl Drawable for HairCube {
             tnt_texture:
                 Sampler::new(&self.texture)
                         .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
+            light_color: [self.light_color.0, self.light_color.1, self.light_color.2],
         };
 
         frame
@@ -81,6 +84,12 @@ impl Drawable for HairCube {
                 dramparams,
             )
             .unwrap();
+    }
+}
+
+impl HairCube {
+   pub fn set_light_color(&mut self, color: (f32, f32, f32)) {
+        self.light_color = color;
     }
 }
 
