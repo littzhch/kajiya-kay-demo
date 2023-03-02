@@ -36,8 +36,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut rate = RefreshRate::new(61.0);
     let mut camera_handler = CameraHandler::new();
 
-    let light = Light::init(&display);
-    let hair_cube = HairCube::init(&display);
+    let light_color = (0.0, 1.0, 1.0);
+    let mut light = Light::init(&display);
+    let mut hair_cube = HairCube::init(&display);
+    light.set_light_color(light_color);
+    hair_cube.set_light_color(light_color);
 
     event_loop.run(move |event, _, controlflow| {
         camera_handler.handle_event(&event, display.gl_window().window());
