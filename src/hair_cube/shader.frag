@@ -15,18 +15,17 @@ uniform vec3 camera_pos;
 
 
 void main() {
-    float ambient_strength = 0.05;
+    float ambient_strength = 0.2;
     vec3 ambient = ambient_strength * light_color;
 
-    float diffuse_strength = 0.1;
+    float diffuse_strength = 0.5;
     vec3 light_dir = normalize(light_pos - FragPos);
     float diff = max(dot(light_dir, Normal), 0.0);
     vec3 diffuse = diffuse_strength * diff * light_color;
 
-
-    float specular_strength = 1.0;
+    float specular_strength = 1.5;
     float ctrl = max(normalize(dot(light_dir, Normal)), 0.0);
-    vec3 binormal = 0.1 * (length(texture(shifp_map, TexCoord)) - 0.5) * Normal + Binormal;
+    vec3 binormal = 0.4 * (length(texture(shifp_map, TexCoord)) - 0.5) * Normal + Binormal;
 
     vec3 view_dir = normalize(camera_pos - FragPos);
     vec3 half_vec = normalize(view_dir + light_dir);

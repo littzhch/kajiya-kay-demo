@@ -167,7 +167,7 @@ impl Vertex {
 }
 
 fn create_texture(display: &Display) -> SrgbTexture2d {
-    let image = image::load(Cursor::new(include_bytes!("tnt.png")), ImageFormat::Png)
+    let image = image::load(Cursor::new(include_bytes!("hair.png")), ImageFormat::Png)
         .unwrap()
         .to_rgba8();
     let id = image.dimensions();
