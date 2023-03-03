@@ -80,9 +80,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         let mut target = display.draw();
         target.clear_color_and_depth(
             (
-                0.05 * light_color.0,
-                0.05 * light_color.1,
-                0.05 * light_color.2,
+                0.2 * light_color.0,
+                0.2 * light_color.1,
+                0.2 * light_color.2,
                 1.0,
             ),
             1.0,
