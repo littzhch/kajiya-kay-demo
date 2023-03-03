@@ -1,5 +1,4 @@
 use std::io::Cursor;
-use std::panic::catch_unwind;
 
 use glium::{
     Display, DrawParameters, Frame, implement_vertex, IndexBuffer, Program, Surface, texture,
@@ -108,10 +107,10 @@ impl Drawable for HairCube {
             ],
             tnt_texture:
                 Sampler::new(&self.texture)
-                        .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
+                        .magnify_filter(glium::uniforms::MagnifySamplerFilter::Linear),
             shift_map:
                 Sampler::new(&self.texture)
-                        .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
+                        .magnify_filter(glium::uniforms::MagnifySamplerFilter::Linear),
             light_color: [self.light_color.0, self.light_color.1, self.light_color.2],
             light_pos: *self.light_pos.as_array(),
             camera_pos: *self.camera_pos.as_array(),
