@@ -88,10 +88,12 @@ impl Camera {
                 self.pos = self.pos - self.front * move_speed;
             }
             CameraMovement::Left => {
-                self.pos = self.pos - glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
+                self.pos =
+                    self.pos - glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
             }
             CameraMovement::Right => {
-                self.pos = self.pos + glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
+                self.pos =
+                    self.pos + glm::normalize(glm::cross(self.front, UP.clone())) * move_speed;
             }
             CameraMovement::Up => {
                 self.pos = self.pos + UP.clone() * move_speed;

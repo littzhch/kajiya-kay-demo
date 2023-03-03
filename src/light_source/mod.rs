@@ -1,9 +1,10 @@
-use crate::Drawable;
 use glium::{
-    implement_vertex, uniform, Display, DrawParameters, Frame, IndexBuffer, Program, Surface,
+    Display, DrawParameters, Frame, implement_vertex, IndexBuffer, Program, Surface, uniform,
     VertexBuffer,
 };
 use glm::{Mat4, Vec3};
+
+use crate::Drawable;
 
 pub struct Light {
     program: Program,
@@ -69,12 +70,7 @@ impl Drawable for Light {
         Self::new(display)
     }
 
-    fn draw_with_frame(
-        &self,
-        frame: &mut Frame,
-        camera_mat: Mat4,
-        dramparams: &DrawParameters,
-    ) {
+    fn draw_with_frame(&self, frame: &mut Frame, camera_mat: Mat4, dramparams: &DrawParameters) {
         let uniforms = uniform! {
             camera: [
                 *camera_mat.as_array()[0].as_array(),

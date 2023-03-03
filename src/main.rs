@@ -28,10 +28,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         depth: glium::Depth {
             test: glium::DepthTest::IfLess,
             write: true,
-            .. Default::default()
+            ..Default::default()
         },
         backface_culling: glium::draw_parameters::BackfaceCullingMode::CullClockwise,
-        .. Default::default()
+        ..Default::default()
     };
 
     let mut camera = Camera::new();

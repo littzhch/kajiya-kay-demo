@@ -1,12 +1,12 @@
+use glium::{Display, DrawParameters, Frame};
+use glm::Mat4;
+
 pub mod camera;
 pub mod camera_events;
 pub mod refresh_rate;
 
-pub mod light_source;
 pub mod hair_cube;
-
-use glium::{Display, DrawParameters, Frame};
-use glm::Mat4;
+pub mod light_source;
 
 pub trait Drawable {
     fn init(display: &Display) -> Self;

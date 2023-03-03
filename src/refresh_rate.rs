@@ -13,13 +13,13 @@ impl RefreshRate {
         }
     }
 
-    /// tell RefreshRate that you will refresh now and get the next refresh time 
+    /// tell RefreshRate that you will refresh now and get the next refresh time
     pub fn refresh_now(&mut self) -> Instant {
         let next_update = self.last_update + self.interval;
         self.last_update = Instant::now();
         next_update
     }
-    
+
     /// get interval between refreshes
     pub fn interval(&self) -> Duration {
         self.interval

@@ -1,7 +1,11 @@
 use std::time::Duration;
-use crate::camera::{Camera, CameraMovement};
-use glium::glutin::event::{DeviceEvent, ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
+
+use glium::glutin::event::{
+    DeviceEvent, ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent,
+};
 use glium::glutin::window::{CursorGrabMode, Window};
+
+use crate::camera::{Camera, CameraMovement};
 
 pub struct CameraHandler {
     cursor_in: bool,
@@ -32,63 +36,90 @@ impl CameraHandler {
 
     pub fn handle_event<T: 'static>(&mut self, event: &Event<T>, window: &Window) {
         match event {
-            Event::WindowEvent {event, ..} => {
-                match event {
-                    WindowEvent::CursorEntered {..} => {
-                        self.cursor_in = true;
-                    },
-                    WindowEvent::CursorLeft {..} => {
-                        self.cursor_in = false;
-                    },
-                    _ => { },
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CursorEntered { .. } => {
+                    self.cursor_in = true;
                 }
+                WindowEvent::CursorLeft { .. } => {
+                    self.cursor_in = false;
+                }
+                _ => {}
             },
-            Event::DeviceEvent {event, ..} => {
+            Event::DeviceEvent { event, .. } => {
                 match event {
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::W), state, ..}) => {
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::W),
+                        state,
+                        ..
+                    }) => {
                         self.w_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::S), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::S),
+                        state,
+                        ..
+                    }) => {
                         self.s_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::A), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::A),
+                        state,
+                        ..
+                    }) => {
                         self.a_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::D), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::D),
+                        state,
+                        ..
+                    }) => {
                         self.d_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::LShift), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::LShift),
+                        state,
+                        ..
+                    }) => {
                         self.lshift_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::Space), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::Space),
+                        state,
+                        ..
+                    }) => {
                         self.space_pressed = *state == ElementState::Pressed;
-                    },
-                    DeviceEvent::Key(KeyboardInput {virtual_keycode: Some(VirtualKeyCode::Escape), state, ..}) => {
+                    }
+                    DeviceEvent::Key(KeyboardInput {
+                        virtual_keycode: Some(VirtualKeyCode::Escape),
+                        state,
+                        ..
+                    }) => {
                         if *state == ElementState::Pressed && self.cursor_grabed {
                             window.set_cursor_grab(CursorGrabMode::None).unwrap(); //TODO: handle error
                             window.set_cursor_visible(true);
                             self.cursor_grabed = false;
                         }
-                    },
-                    DeviceEvent::MouseMotion {delta: (x, y)} => {
+                    }
+                    DeviceEvent::MouseMotion { delta: (x, y) } => {
                         self.mouse_delta = (*x as f32, *y as f32);
-                    },
-                    DeviceEvent::Button {button: 1, state} => {
-                        if *state == ElementState::Pressed && self.cursor_in && ! self.cursor_grabed {
+                    }
+                    DeviceEvent::Button { button: 1, state } => {
+                        if *state == ElementState::Pressed && self.cursor_in && !self.cursor_grabed
+                        {
                             window.set_cursor_grab(CursorGrabMode::Confined).unwrap(); //TODO: handle error
                             window.set_cursor_visible(false);
                             self.cursor_grabed = true;
                         }
-                    },
-                    _ => {},
+                    }
+                    _ => {}
                 }
             }
-            _ => {},
+            _ => {}
         }
     }
 
     pub fn update_camera(&mut self, camera: &mut Camera, delta_time: Duration) {
-        if ! self.cursor_grabed {
+        if !self.cursor_grabed {
             return;
         }
         if self.w_pressed {
@@ -110,7 +141,10 @@ impl CameraHandler {
             camera.update(delta_time, CameraMovement::Up);
         }
         if self.mouse_delta.0 != 0.0 || self.mouse_delta.1 != 0.0 {
-            camera.update(delta_time, CameraMovement::Rotate(self.mouse_delta.0, self.mouse_delta.1));
+            camera.update(
+                delta_time,
+                CameraMovement::Rotate(self.mouse_delta.0, self.mouse_delta.1),
+            );
             self.mouse_delta = (0.0, 0.0);
         }
     }
