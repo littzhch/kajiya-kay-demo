@@ -167,7 +167,7 @@ impl Vertex {
 }
 
 fn create_texture(display: &Display) -> SrgbTexture2d {
-    let image = image::load(Cursor::new(include_bytes!("hair.png")), ImageFormat::Png)
+    let image = image::load(Cursor::new(include_bytes!("hair1024.png")), ImageFormat::Png)
         .unwrap()
         .to_rgba8();
     let id = image.dimensions();
@@ -176,7 +176,7 @@ fn create_texture(display: &Display) -> SrgbTexture2d {
 }
 
 fn create_shift_map(display: &Display) -> SrgbTexture2d { //TODO: 改为合适的材质类型
-    let image = image::load(Cursor::new(include_bytes!("shift_map.png")), ImageFormat::Png)
+    let image = image::load(Cursor::new(include_bytes!("shift_map1024.png")), ImageFormat::Png)
         .unwrap()
         .to_rgba8();
     let id = image.dimensions();

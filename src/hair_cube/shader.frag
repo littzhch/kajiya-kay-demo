@@ -25,7 +25,7 @@ void main() {
 
     float specular_strength = 1.5;
     float ctrl = max(normalize(dot(light_dir, Normal)), 0.0);
-    vec3 binormal = 0.4 * (length(texture(shifp_map, TexCoord)) - 0.5) * Normal + Binormal;
+    vec3 binormal = 0.3 * (length(texture(shifp_map, TexCoord)) - 0.5) * Normal + Binormal;
 
     vec3 view_dir = normalize(camera_pos - FragPos);
     vec3 half_vec = normalize(view_dir + light_dir);
