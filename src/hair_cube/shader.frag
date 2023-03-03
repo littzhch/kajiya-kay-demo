@@ -23,8 +23,8 @@ void main() {
 
     float specular_strength = 2.0;
     vec3 view_dir = normalize(camera_pos - FragPos);
-    vec3 reflect_dir = reflect(-light_dir, Normal);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 512);
+    vec3 half_vec = normalize(view_dir + light_dir);
+    float spec = pow(max(dot(Normal, half_vec), 0.0), 64);
     vec3 specular = specular_strength * spec * light_color;
 
     vec3 light_result = ambient + diffuse + specular;
