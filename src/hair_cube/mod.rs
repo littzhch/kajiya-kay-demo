@@ -229,7 +229,7 @@ impl Drawable for HairCube {
                 Sampler::new(&self.texture)
                         .magnify_filter(glium::uniforms::MagnifySamplerFilter::Linear),
             shift_map:
-                Sampler::new(&self.texture)
+                Sampler::new(&self.shift_map)
                         .magnify_filter(glium::uniforms::MagnifySamplerFilter::Linear),
             light_color: [self.light_color.0, self.light_color.1, self.light_color.2],
             light_pos: *self.light_pos.as_array(),
