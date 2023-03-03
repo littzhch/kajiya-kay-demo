@@ -6,6 +6,7 @@ use glium::glutin::dpi::PhysicalSize;
 use glium::glutin::event::{Event, StartCause, WindowEvent};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::window::WindowBuilder;
+use glm::Vec3;
 
 use kajiya_kay_demo::camera::Camera;
 use kajiya_kay_demo::camera_events::CameraHandler;
@@ -38,10 +39,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut camera_handler = CameraHandler::new();
 
     let light_color = (1.0, 1.0, 1.0);
+    let light_pos = Vec3::new(2.0, 0.9, -4.0);
+
     let mut light = Light::init(&display);
     let mut hair_cube = HairCube::init(&display);
     light.set_light_color(light_color);
+    light.set_light_pos(light_pos);
     hair_cube.set_light_color(light_color);
+    hair_cube.set_light_pos(light_pos);
 
     event_loop.run(move |event, _, controlflow| {
         camera_handler.handle_event(&event, display.gl_window().window());
@@ -68,6 +73,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         *controlflow = ControlFlow::WaitUntil(rate.refresh_now());
         camera_handler.update_camera(&mut camera, rate.interval());
+        hair_cube.set_camera_pos(camera.get_camera_pos());
 
         let camera_mat = camera.get_mat();
 

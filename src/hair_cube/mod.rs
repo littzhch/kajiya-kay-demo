@@ -6,8 +6,9 @@ use glium::{
 };
 use glium::texture::SrgbTexture2d;
 use glium::uniforms::Sampler;
-use glm::Mat4;
+use glm::{Mat4, Vec3};
 use image::ImageFormat;
+use num_traits::One;
 
 use crate::Drawable;
 
@@ -17,6 +18,8 @@ pub struct HairCube {
     indices: IndexBuffer<u8>,
     texture: SrgbTexture2d,
     light_color: (f32, f32, f32),
+    light_pos: Vec3,
+    camera_pos: Vec3,
 }
 
 impl Drawable for HairCube {
@@ -91,6 +94,8 @@ impl Drawable for HairCube {
             indices,
             texture,
             light_color: (1.0, 1.0, 1.0),
+            light_pos: Vec3::one(),
+            camera_pos: Vec3::one(),
         }
     }
 
@@ -106,6 +111,8 @@ impl Drawable for HairCube {
                 Sampler::new(&self.texture)
                         .magnify_filter(glium::uniforms::MagnifySamplerFilter::Nearest),
             light_color: [self.light_color.0, self.light_color.1, self.light_color.2],
+            light_pos: *self.light_pos.as_array(),
+            camera_pos: *self.camera_pos.as_array(),
         };
 
         frame
@@ -121,8 +128,14 @@ impl Drawable for HairCube {
 }
 
 impl HairCube {
-   pub fn set_light_color(&mut self, color: (f32, f32, f32)) {
+    pub fn set_light_color(&mut self, color: (f32, f32, f32)) {
         self.light_color = color;
+    }
+    pub fn set_light_pos(&mut self, pos: Vec3) {
+        self.light_pos = pos;
+    }
+    pub fn set_camera_pos(&mut self, pos: Vec3) {
+        self.camera_pos = pos;
     }
 }
 

@@ -1,7 +1,7 @@
 use std::time::Duration;
-use glm::{Matrix4, Vector3};
-use once_cell::sync::Lazy;
 
+use glm::{Matrix4, Vec3, Vector3};
+use once_cell::sync::Lazy;
 
 /// global up vector
 static UP: Lazy<Vector3<f32>> = Lazy::new(|| Vector3::new(0.0, 1.0, 0.0));
@@ -125,6 +125,10 @@ impl Camera {
         let view_mat = glm::ext::look_at(self.pos, self.pos + self.front, UP.clone());
         let proj_mat = glm::ext::perspective(FOV, ASPECT, NEAR, FAR);
         proj_mat * view_mat
+    }
+
+    pub fn get_camera_pos(&self) -> Vec3 {
+        self.pos
     }
 
     /// return normalized front vector
